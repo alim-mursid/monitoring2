@@ -116,7 +116,14 @@
         const dropZone = document.getElementById('drop-zone');
 
         // Gemini API Configuration
-        const apiKey = ""; // Dibiarkan kosong, akan diinjeksi oleh environment
+        // ====================================================================================
+        // PENTING: Untuk menjalankan file ini di komputer Anda, Anda memerlukan API Key sendiri.
+        // 1. Dapatkan API Key gratis dari Google AI Studio: https://aistudio.google.com/app/apikey
+        // 2. Salin API Key tersebut.
+        // 3. Tempel (paste) API Key Anda di antara tanda kutip di bawah ini.
+        // ====================================================================================
+        const apiKey = "PASTE_YOUR_API_KEY_HERE"; // <-- GANTI DENGAN API KEY ANDA
+
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
         // Function to convert file to Base64
@@ -167,6 +174,23 @@
 
         // Handle analysis button click
         analyzeBtn.addEventListener('click', async () => {
+            // Cek apakah API Key sudah diisi
+            if (apiKey === "PASTE_YOUR_API_KEY_HERE" || !apiKey) {
+                resultContainer.classList.remove('hidden');
+                loader.classList.add('hidden');
+                analysisResult.classList.remove('hidden');
+                analysisResult.innerHTML = `
+                    <p class="font-bold text-red-400 text-lg">Konfigurasi Diperlukan!</p>
+                    <p class="mt-2">Anda belum memasukkan API Key. Untuk menjalankan aplikasi ini, silakan:</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-1">
+                        <li>Buka file <code class="bg-gray-700 px-1 rounded">scalping_analyzer.html</code> di editor teks.</li>
+                        <li>Dapatkan API Key gratis dari <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-blue-400 hover:underline">Google AI Studio</a>.</li>
+                        <li>Ganti tulisan <strong>"PASTE_YOUR_API_KEY_HERE"</strong> dengan API Key Anda.</li>
+                    </ol>
+                `;
+                return;
+            }
+            
             const file = chartImageInput.files[0];
             if (!file) {
                 analysisResult.textContent = 'Silakan pilih gambar terlebih dahulu.';
@@ -218,7 +242,8 @@ Gunakan format jawaban yang jelas dan terstruktur dengan poin-poin. Jangan membe
                 });
 
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    const errorData = await response.json();
+                    throw new Error(`API Error: ${response.status} ${response.statusText}. Pesan: ${errorData.error.message}`);
                 }
 
                 const result = await response.json();
@@ -247,3 +272,4 @@ Gunakan format jawaban yang jelas dan terstruktur dengan poin-poin. Jangan membe
 
 </body>
 </html>
+
